@@ -8,7 +8,7 @@ import { useAuth } from '../../../providers/AuthProvider';
 export default function ProfileScreen() {
   const { session } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
   const [website, setWebsite] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
 
@@ -23,7 +23,7 @@ export default function ProfileScreen() {
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
+        .select(`username, website, avatar_url,full_name`)
         .eq('id', session?.user.id)
         .single();
       if (error && status !== 406) {
@@ -34,6 +34,7 @@ export default function ProfileScreen() {
         setUsername(data.username);
         setWebsite(data.website);
         setAvatarUrl(data.avatar_url);
+        setFullName(data.full_name);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -48,10 +49,12 @@ export default function ProfileScreen() {
     username,
     website,
     avatar_url,
+    full_name,
   }: {
     username: string;
     website: string;
     avatar_url: string;
+    full_name: string;
   }) {
     try {
       setLoading(true);
@@ -62,6 +65,7 @@ export default function ProfileScreen() {
         username,
         website,
         avatar_url,
+        full_name,
         updated_at: new Date(),
       };
 
@@ -86,11 +90,19 @@ export default function ProfileScreen() {
       </View>
       <View style={styles.verticallySpaced}>
         <Input
+          label='Full name'
+          value={fullName || ''}
+          onChangeText={(text) => setFullName(text)}
+        />
+      </View>
+      {/* 
+      <View style={styles.verticallySpaced}>
+        <Input
           label='Username'
           value={username || ''}
           onChangeText={(text) => setUsername(text)}
         />
-      </View>
+      </View> */}
       <View style={styles.verticallySpaced}>
         <Input
           label='Website'
@@ -103,7 +115,12 @@ export default function ProfileScreen() {
         <Button
           title={loading ? 'Loading ...' : 'Update'}
           onPress={() =>
-            updateProfile({ username, website, avatar_url: avatarUrl })
+            updateProfile({
+              username,
+              website,
+              avatar_url: avatarUrl,
+              full_name,
+            })
           }
           disabled={loading}
         />
