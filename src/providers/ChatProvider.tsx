@@ -40,7 +40,7 @@ export default function ChatProvider({ children }: PropsWithChildren) {
       }
       setIsReady(false);
     };
-  }, [profile]);
+  }, [profile?.id]);
 
   if (!isReady) {
     return <ActivityIndicator />;
